@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+<meta charset="utf-8" />
+<title>芸泰接口测试平台</title>
+<meta name="viewport"
+	content="width=device-width, initial-scale=1.0, maximum-scale=1, user-scalable=no" />
+<link rel="stylesheet" type="text/css" href="/css/qa.css" />
+<link rel="stylesheet" type="text/css" href="/css/bootstrap.min.css" />
+<link rel="stylesheet" type="text/css" href="/css/fileinput.min.css" />
+</head>
+<body class="bodybg">
+	<nav class="navbar navbar-default">
+		<div class="container-fluid">
+			<!-- Brand and toggle get grouped for better mobile display -->
+			<div class="navbar-header">
+				<button type="button" class="navbar-toggle collapsed"
+					data-toggle="collapse" data-target="#bs-example-navbar-collapse-1"
+					aria-expanded="false">
+					<span class="sr-only">Toggle navigation</span> <span
+						class="icon-bar"></span> <span class="icon-bar"></span> <span
+						class="icon-bar"></span>
+				</button>
+				<a class="navbar-left" href="#"> <img alt="logo"
+					src="/images/logo.png" />
+				</a>
+			</div>
+
+			<!-- Collect the nav links, forms, and other content for toggling -->
+			<div class="collapse navbar-collapse"
+				id="bs-example-navbar-collapse-1">
+				<ul class="nav navbar-nav navbar-right">
+					<li class="dropdown"><a href="#" class="dropdown-toggle"
+						data-toggle="dropdown" role="button" aria-haspopup="true"
+						aria-expanded="false"><span th:text="${username}"></span> <span
+							class="caret"></span></a>
+						<ul class="dropdown-menu">
+							<li><a href="#">个人中心</a></li>
+							<li role="separator" class="divider"></li>
+							<li><a href="/doLoginOut">注销</a></li>
+						</ul></li>
+				</ul>
+			</div>
+			<!-- /.navbar-collapse -->
+		</div>
+		<!-- /.container-fluid -->
+	</nav>
+	<div class="container">
+		<div class="page-header">
+			<h2>上传接口测试用例：</h2>
+		</div>
+
+		<div class="panel panel-default">
+			<!-- Default panel contents -->
+			<div class="panel-heading">上传一个测试用例<a href="/downloadTemplate" id="download" > >>> (下载模板)  </a></div>
+			<div class="panel-body">
+ 				<form id="uploadForm" enctype="multipart/form-data">
+ 				<label>选择上传的文件: </label>
+					<input type="file" name="file" id="file" onchange="filechange(this.id)" /> <br/>
+					<button type="button" class="btn btn-danger" id="uploadfile" onclick="upload()">上传</button>
+					<span id="fileSpan"></span>
+				</form>
+
+<!-- 				<label class="control-label">Select File</label> 
+				<input id="uploadfile" type="file" class="file" /> -->
+			</div>
+			<!-- Table -->
+			<table class="table" id="fileTable">
+				<thead>
+					<tr>
+						<th>#</th>
+						<th>测试用例</th>
+						<th>操作</th>
+					</tr>
+				</thead>
+				<tbody id="fileBody"></tbody>
+			</table>
+		</div>
+		<button class="btn btn-primary btn-block" style="display:none" type="button" id="btnSubmit" onclick="location='/test/interface-test-detail-page'">下一步</button>
+	</div>
+
+	<script src="/js/jquery-3.1.1.min.js"></script>
+	<!-- BOOTSTRAP -->
+	<script src="/js/bootstrap.min.js"></script>
+	<script src="/js/fileinput.min.js"></script>
+	<script src="/js/canvas-to-blob.min.js"></script>
+	<script type="text/javascript">
+		var casenum = 1;
+		$(document).ready(function(){
+			$.get({
+				url : "/getUploadedFiles",
+				success : function(data){
+					if(data.result == 'OK'){
+						var fnlist = data.filelist;
+						var len = fnlist.length;
+						for(var i=0; len>i; i++){
+							$("#fileBody").append('<tr id="tr' + (i+1) + '"><th>' + (i+1) + '</th><td id="excelNameId' + (i+1) + '" >' + fnlist[i] + '</td><td><a href="javascript:;" id="del' + (i+1) + '" onclick="deleteExcelFile(' + (i+1) + ')">删除</a></td></tr>');
+							casenum = casenum + 1;
+						}
+						if(len>0){
+							$("#btnSubmit").css('display','block');
+						}
+					}
+				}
+			});
+		});
+
+		function loginout() {
+			$.post("/doLoginOut", function() {
+				window.location.href = "/login"
+			});
+		}
+		
+		function upload(){
+			$.ajax({
+			    url: '/upload',
+			    type: 'POST',
+			    cache: false,
+			    data: new FormData($('#uploadForm')[0]),
+			    processData: false,
+			    contentType: false,
+			    success : function(data){
+			    	if((data.result == 'OK')){
+			    		if(data.exist == 'NO'){
+			    			$("#fileBody").append('<tr id="tr' + casenum + '"><th>' + casenum + '</th><td id="excelNameId' + casenum + '" >' + data.filename + '</td><td><a href="javascript:;" id="del' + casenum + '" onclick="deleteExcelFile(' + casenum + ')">删除</a></td></tr>');
+				    		$("#fileSpan").html('<span class="text-danger">上传成功！</span>');
+				    		casenum++;
+			    		}else if(data.exist == 'YES'){
+				    		$("#fileSpan").html('<span class="text-danger">上传成功！已经覆盖原文件！</span>');
+				    	}
+			    		$("#btnSubmit").css('display','block');
+			    	}
+			    	if(data.NOTFOUND == "YES"){
+			    		$("#fileSpan").html('<span class="text-danger">请选择上传的文件！</span>');
+			    	}
+			    }
+			});
+		}
+		
+		function filechange(id){
+			$("#fileSpan").html("");
+			var val = document.getElementById(id).value;
+			var reg = /^.*.(?:xls|x)$/;
+			if(!reg.test(val)){
+				$("#fileSpan").html('<span class="text-danger">请选择excel文件，文件格式：xls或xlsx</span>');
+				$("#uploadfile").attr('disabled',true);
+			}else{
+				$("#uploadfile").attr('disabled',false);
+			}
+		}
+		
+		function deleteExcelFile(index){
+			var delFileName = $("#excelNameId" + index).text();
+			console.info(delFileName);
+			var params = {};
+			params.excelFileName = delFileName; 
+			$.ajax({
+				url: "/deleteExcelFile",
+				type: "post",
+				data: params,
+				dataType: "json",
+				success: function(data){
+					if(data.result == 'OK'){
+						console.info("success: " + data);
+						$("#tr" + index).remove();
+					}else if(data.result == 'FAIL'){
+						alert("删除失败，请重试！");
+					}
+				},
+				error: function(data){
+					console.info("error: " + data);
+					alert("未知原因，请稍后重试！");
+				}
+			});
+		}
+		
+	</script>
+</body>
+</html>

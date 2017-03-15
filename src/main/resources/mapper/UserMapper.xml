@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+    PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+    <mapper namespace="com.yt.qa.dao.UserMapper">
+        <resultMap type="com.yt.qa.entity.UserDO" id="userMapper">
+            <id property="id" column="id" javaType="Long" />
+            <result property="username" column="user_name" javaType="string"/>
+            <result property="email" column="email" javaType="string"/>
+            <result property="deleted" column="deleted" javaType="int"/>
+            <result property="createTime" column="create_time" javaType="date"/>
+            <result property="updateTime" column="update_time" javaType="date"/>
+        </resultMap>
+        
+        <select id="findUser" resultMap="userMapper">
+			SELECT user_name, password, email, create_time FROM user where deleted = '0'
+			<if test="email != null">
+			    and email = #{email}
+			</if>
+			<if test="password != null">
+			    and password = #{password}
+			</if>		    
+        </select>
+        
+        <select id="findUsers" resultMap="userMapper">
+            SELECT user_name, password, email, create_time FROM user where deleted = '0';
+        </select>
+        
+        <select id="findUserByUserName" resultMap="userMapper">
+            SELECT user_name, password, email, create_time FROM user where deleted = '0'
+            <if test="email != null">
+                and email = #{email}
+            </if>
+        </select>
+        
+        <insert id="addUser" >
+            Insert into user(user_name, password, email, create_time, update_time) value(#{name}, #{password},#{email},now(),now());
+        </insert>
+        
+        <update id="updatePassword">
+            Update user set password = #{password} where email = #{email};
+        </update>
+        
+    </mapper>

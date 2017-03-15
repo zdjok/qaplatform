@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+<meta charset="utf-8" />
+<title>芸泰接口测试平台</title>
+<meta name="viewport"
+	content="width=device-width, initial-scale=1.0, maximum-scale=1, user-scalable=no" />
+<link rel="stylesheet" type="text/css" href="/css/qa.css" />
+<link rel="stylesheet" type="text/css" href="/css/bootstrap.min.css" />
+<link rel="stylesheet" type="text/css" href="/css/fileinput.min.css" />
+<script src="/js/jquery-3.1.1.min.js"></script>
+<!-- BOOTSTRAP -->
+<script src="/js/bootstrap.min.js"></script>
+</head>
+
+<body class="bodybg">
+	<div class="container">
+		<div class="page-header">
+			<h2 id="containerHead">本次测试报告：</h2>
+		</div>
+
+		<div class="panel panel-default">
+			<!-- Default panel contents -->
+			<div class="panel-heading" id="panelHead">历史测试报告：</div>
+			<div class="panel-body" id="historyReportDiv">#{reportHtml}</div>
+		</div>
+	</div>
+</body>
+
+</html>

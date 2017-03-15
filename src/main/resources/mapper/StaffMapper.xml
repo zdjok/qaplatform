@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+    PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.yt.qa.dao.StaffMapper">
+    <resultMap type="com.yt.qa.entity.StaffDO" id="staffMapper">
+        <id property="id" column="id" javaType="int"/>
+        <result property="name" column="name" javaType="string"/>
+        <result property="sex" column="sex" javaType="string"/>
+        <result property="age" column="age" javaType="int"/>
+        <result property="address" column="address" javaType="string"/>
+    </resultMap>
+    
+    <select id="selectStaffById"  parameterType="int"  resultMap="staffMapper">
+        select id, name, sex, age, address from staff where id = #{id}
+    </select>
+    
+    <select id="getAllStaff" resultMap="staffMapper">
+        select id, name, sex, age, address from staff
+    </select>
+</mapper>

@@ -1,0 +1,290 @@
+﻿<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+<meta charset="utf-8" />
+<title>芸泰接口测试平台</title>
+<meta name="viewport"
+	content="width=device-width, initial-scale=1.0, maximum-scale=1, user-scalable=no" />
+<link rel="stylesheet" type="text/css" href="/css/cloud-admin.min.css" />
+<link rel="stylesheet" type="text/css" href="/css/bootstrap.min.css" />
+<link rel="stylesheet" type="text/css"
+	href="/css/bootstrapValidator.min.css" />
+<!-- DATE RANGE PICKER -->
+<link rel="stylesheet" type="text/css"
+	href="/css/daterangepicker-bs3.css" />
+<!-- ANIMATE -->
+<link rel="stylesheet" type="text/css" href="/css/animate.min.css" />
+<link rel="stylesheet" type="text/css" href="/css/font-awesome.min.css" />
+<link rel="stylesheet" type="text/css" href="/css/toastr.min.css" />
+</head>
+<body class="login">
+	<!-- PAGE -->
+	<section id="page">
+		<!-- LOGIN -->
+		<section id="login" class="visible">
+			<div class="container">
+				<div class="row">
+					<div class="col-md-4 col-md-offset-4">
+						<div class="login-box-plain">
+							<h2 class="bigintro">登录</h2>
+							<div class="divide-40"></div>
+							<form role="form">
+								<div class="form-group" id="emailDiv">
+									<label for="email">用户名</label> <span id="emailSpan"></span> <i
+										class="fa fa-envelope"></i> <input type="email"
+										class="form-control" id="email" name="username"
+										onblur="validateEmpty('email')"
+										placeholder="请输入用户名！格式：xxx@xx.xx" />
+								</div>
+								<div class="form-group" id="passwordDiv">
+									<label for="password">密码</label> <span id="passwordSpan"></span>
+									<i class="fa fa-lock"></i> <input type="password"
+										class="form-control" id="password" name="password"
+										onblur="validateEmpty('password')" placeholder="请输入密码！" />
+								</div>
+								<div class="form-actions">
+									<!-- <button type="submit" class="btn btn-danger" id="loginBtn" onclick="validateEmpty('email');return validateEmpty('password')">登录</button> -->
+									<button type="button" class="btn btn-danger" id="loginBtn"
+										onclick="return loginAjax()">登录</button>
+								</div>
+							</form>
+							<div class="login-helpers">
+								<a href="#" onclick="swapScreen('forgot');return false;">忘记密码？</a>
+								<br /> 没有账号？ <a href="#"
+									onclick="swapScreen('register');return false;">现在注册！</a>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</section>
+		<!--/LOGIN -->
+		<!-- REGISTER -->
+		<section id="register">
+			<div class="container">
+				<div class="row">
+					<div class="col-md-4 col-md-offset-4">
+						<div class="login-box-plain">
+							<h2 class="bigintro">注册</h2>
+							<div class="divide-40"></div>
+							<form role="form">
+								<div class="form-group" id="regemailDiv">
+									<label for="email">用户名</label> <span id="regemailSpan"></span>
+									<i class="fa fa-envelope"></i> <input type="email"
+										class="form-control" id="regemail" name="regusername"
+										onblur="validateEmpty('regemail')"
+										aria-describedby="emailHelp" placeholder="请输入用户名！格式：xxx@xx.xx" />
+								</div>
+								<div class="form-group" id="regpasswordDiv">
+									<label for="password">密码</label> <span id="regpasswordSpan"></span>
+									<i class="fa fa-lock"></i> <input type="password"
+										class="form-control" id="regpassword" name="regpassword"
+										onblur="validateEmpty('regpassword')" placeholder="请输入密码！" />
+								</div>
+								<div class="form-group" id="regpassword2Div">
+									<label for="password2">确认密码</label> <span id="regpassword2Span"></span>
+									<i class="fa fa-lock"></i> <input type="password"
+										class="form-control" id="regpassword2" name="regpassword2"
+										onblur="validateEmpty('regpassword2')" placeholder="请输入确认密码！" />
+								</div>
+								<div class="form-actions">
+									<button type="button" class="btn btn-success" id="registBtn"
+										onclick="register()">注册</button>
+								</div>
+							</form>
+							<div class="login-helpers">
+								<a href="#" onclick="swapScreen('login');return false;"> 登录</a>
+								<br />
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</section>
+		<!--/REGISTER -->
+		<!-- FORGOT PASSWORD -->
+		<section id="forgot">
+			<div class="container">
+				<div class="row">
+					<div class="col-md-4 col-md-offset-4">
+						<div class="login-box-plain">
+							<h2 class="bigintro">重置密码</h2>
+							<div class="divide-40"></div>
+							<form role="form">
+								<div class="form-group" id="rstemailDiv">
+									<label for="email">邮箱</label> <span id="rstemailSpan"></span>
+									<i class="fa fa-envelope"></i> <input type="email"
+										class="form-control" id="rstemail" name="rstemail"
+										onblur="validateEmpty('rstemail')" placeholder="请输入邮箱！格式：xxx@xx.xx" />
+								</div>
+								<div class="form-actions">
+									<button type="button" class="btn btn-info" id="rstemailBtn"
+										onclick="resetPassword('rstemail')">重置</button>
+								</div>
+							</form>
+							<div class="login-helpers">
+								<a href="#" onclick="swapScreen('login');return false;">登录</a> <br />
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</section>
+		<!-- FORGOT PASSWORD -->
+	</section>
+	<!--/PAGE -->
+	<!-- JAVASCRIPTS -->
+	<!-- Placed at the end of the document so the pages load faster -->
+	<!-- JQUERY -->
+	<script src="/js/jquery-3.1.1.min.js"></script>
+	<!-- BOOTSTRAP -->
+	<script src="/js/bootstrap.min.js"></script>
+	<script src="/js/bootstrapValidator.min.js"></script>
+	<script src="/js/toastr.min.js"></script>
+	<!-- 	<script src="/js/login.js"></script> -->
+
+	<!-- CUSTOM SCRIPT -->
+	
+	<script type="text/javascript">
+        toastr.options = {positionClass: 'toast-top-center',showDuration: '3000'};
+ 	</script>
+	<script type="text/javascript">
+		function swapScreen(id) {
+			$('.visible').removeClass('visible animated fadeInUp');
+			$('#' + id).addClass('visible animated fadeInUp');
+		}
+		
+		function validateEmpty(eleId){
+			if($("#" + eleId).val() == ""){
+				$("#" + eleId + "Div").attr("class","form-group has-error");
+				$("#" + eleId + "Span").html('<span class="text-danger">该字段的内容不能为空！</span>');
+				return false;
+			} else{
+				$("#" + eleId + "Div").attr("class","form-group has-success");
+				$("#" + eleId + "Span").html('<span class="text-success"></span>');
+				return true;
+			}
+		}
+		
+		function loginAjax(){
+			if(!validateEmpty('email')){
+				return false;
+			}
+			if(!validateEmpty('password')){
+				return false;
+			}
+			var params = {};
+			params.username = $("#email").val();
+			params.password = $("#password").val();
+			$.ajax({
+				url : '/doLogin',
+				type : 'post',
+				dataType : 'json',  
+				data : params,
+				success : function(data){
+					if(data.result == 'OK'){
+						window.location.href="test/select-type";
+					}else{
+						$("#emailDiv").attr("class","form-group has-error");
+						$("#emailSpan").html('<span class="text-danger">用户名或密码不正确</span>');
+/* 						alert("NOT OK") */
+					}
+				},
+				error : function(data){
+					alert("未知原因，请稍后重试！");
+				}
+			});
+		}
+		
+		function register(){
+			var email = $("#regemail").val();
+			var psw1 = $("#regpassword").val();
+			var psw2 = $("#regpassword2").val();
+			
+ 			if(!validateEmpty('regemail')){
+				return false;
+			}
+ 			if(!isEmail(email)){
+ 				$("#regemailDiv").attr("class","form-group has-error");
+				$("#regemailSpan").html('<span class="text-danger">用户名格式不正确！格式：xxx@xx.xx</span>');
+				return false;
+ 			}
+			if(!validateEmpty('regpassword')){
+				return false;
+			}
+			if(!validateEmpty('regpassword2')){
+				return false;
+			} 
+			if(!(psw1 == psw2)){
+				$("#regemailDiv").attr("class","form-group has-error");
+				$("#regemailSpan").html('<span class="text-danger">两次输入密码不一致，请重新输入！</span>');
+				return false;
+			}
+			
+			var params = {};
+			params.email = email;
+			params.password = psw1;
+			params.password2 = psw2; 
+			$.ajax({
+				url : "/register",
+				type : "post",
+				dataType : "json",
+				data : params,
+				success : function(data){
+					if(data.result == 'OK'){
+						toastr.success("注册成功，请登录！");
+						setTimeout('window.location.href="login"',3000);
+					}else{
+						$("#regemailDiv").attr("class","form-group has-error");
+						$("#regemailSpan").html('<span class="text-danger">' + data.msg + '</span>');
+/* 						alert("NOT OK") */
+					}
+				},
+				error : function(data){
+					alert("未知原因，请稍后重试！");
+				}
+				});
+		}
+		
+		function resetPassword(eleId){
+			var email = $("#" + eleId).val();
+			if(!validateEmpty(eleId)){
+				return false;
+			}
+ 			if(!isEmail(email)){
+ 				$("#" + eleId + "Div").attr("class","form-group has-error");
+				$("#" + eleId + "Span").html('<span class="text-danger">用户名格式不正确！格式：xxx@xx.xx</span>');
+				return false;
+ 			}
+ 			var params = {};
+ 			params.email = email;
+ 			$.ajax({
+ 				url : "/resetPassword",
+ 				type : "post",
+ 				dataType : "json",
+ 				data : params,
+ 				success : function(data){
+					if(data.result == 'OK'){
+						toastr.success("重置成功！\r\n密码已经重置为:123456");
+						setTimeout('window.location.href="login"',3000)
+					}else{
+						$("#" + eleId + "Div").attr("class","form-group has-error");
+						$("#" + eleId + "Span").html('<span class="text-danger">' + data.msg + '</span>');
+/* 						alert("NOT OK") */
+					}
+				},
+				error : function(data){
+					alert("未知原因，请稍后重试！");
+				}
+ 			});
+		}
+		
+		function isEmail(str){
+			var reg = /^(\w)+(\.\w+)*@(\w)+((\.\w+)+)$/;
+			return reg.test(str);
+		}
+	</script>
+	<!-- /JAVASCRIPTS -->
+</body>
+</html>

@@ -1,0 +1,408 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+<meta charset="utf-8" />
+<title>芸泰接口测试平台</title>
+<meta name="viewport"
+	content="width=device-width, initial-scale=1.0, maximum-scale=1, user-scalable=no" />
+<link rel="stylesheet" type="text/css" href="/css/qa.css" />
+<link rel="stylesheet" type="text/css" href="/css/bootstrap.min.css" />
+<link rel="stylesheet" type="text/css" href="/css/fileinput.min.css" />
+</head>
+
+<body class="bodybg">
+	<nav class="navbar navbar-default">
+		<div class="container-fluid">
+			<!-- Brand and toggle get grouped for better mobile display -->
+			<div class="navbar-header">
+				<button type="button" class="navbar-toggle collapsed"
+					data-toggle="collapse" data-target="#bs-example-navbar-collapse-1"
+					aria-expanded="false">
+					<span class="sr-only">Toggle navigation</span> <span
+						class="icon-bar"></span> <span class="icon-bar"></span> <span
+						class="icon-bar"></span>
+				</button>
+				<a class="navbar-left" href="#"> <img alt="logo"
+					src="/images/logo.png" />
+				</a>
+			</div>
+
+			<!-- Collect the nav links, forms, and other content for toggling -->
+			<div class="collapse navbar-collapse"
+				id="bs-example-navbar-collapse-1">
+				<ul class="nav navbar-nav navbar-right">
+					<li class="dropdown"><a href="#" class="dropdown-toggle"
+						data-toggle="dropdown" role="button" aria-haspopup="true"
+						aria-expanded="false"><span th:text="${username}"></span> <span
+							class="caret"></span></a>
+						<ul class="dropdown-menu">
+							<li><a href="javascript:void(0);">个人中心</a></li>
+							<li role="separator" class="divider"></li>
+							<li><a href="/doLoginOut">注销</a></li>
+						</ul></li>
+				</ul>
+			</div>
+			<!-- /.navbar-collapse -->
+		</div>
+		<!-- /.container-fluid -->
+	</nav>
+
+	<div class="container">
+		<div class="page-header">
+			<h2 id="containerHead">测试报告：</h2>
+		</div>
+
+		<div class="panel panel-default">
+			<!-- Default panel contents -->
+			<div class="panel-heading" id="panelHead">
+				本次测试报告：<a href="" id="currentReportDownload"> (>>>>点击下载本次测试报告) </a>
+				<span class="pull-right" id="reportDetail" onclick='toggleFun(reportDetail)'><a
+					href="javascript:void(0);" id="reportDetailA">详情</a><img alt="expand"
+					src="/images/expand.png" id="reportDetailImg" /></span> <input type="hidden"
+					id="currentReportInput"></input>
+			</div>
+			<div class="panel-body" id="reportDetailDiv" style="display: none">
+				<div class="embed-responsive embed-responsive-16by9">
+					<div class="page-header">
+						<h3 id="containerHead">报告详情：</h3>
+					</div>
+					<!-- Table -->
+					<table class="table" id="caesTable">
+						<thead>
+							<tr>
+								<th>模块名称</th>
+								<th>接口名称</th>
+								<th>用例名称</th>
+								<th>测试结果</th>
+							</tr>
+						</thead>
+					</table>
+					<nav aria-label="Page navigation" id="navpanel">
+						<ul class="pagination" id="navigation">
+						</ul>
+					</nav>
+				</div>
+			</div>
+<!-- 			</div>
+			<div class="panel panel-default"> -->
+			<div class="panel-heading" id="panelHead">历史测试报告：
+			<span class="pull-right" id="historyReportDetail"  onclick='toggleFun(historyReportDetail)'><a
+					href="javascript:void(0);" id="historyReportDetailA">详情</a><img alt="expand"
+					src="/images/expand.png" id="historyReportDetailImg" /></span>
+			</div>
+			<div class="panel-body" id="historyReportDetailDiv" style="display:none">
+				<div class="dropdown">
+					<button class="btn btn-primary dropdown-toggle" type="button"
+						id="dropdownHistoryReport" data-toggle="dropdown"
+						aria-haspopup="true" aria-expanded="true">
+						一周内 <span class="caret"></span>
+					</button>
+					<ul class="dropdown-menu" aria-labelledby="dropdownMenu1">
+						<li><a href="javascript:void(0);" id="weekList"
+							onclick='changeHistoryReport(weekList,listWeekGroup)'>一周内</a></li>
+						<li><a href="javascript:void(0);" id="monthList"
+							onclick='changeHistoryReport(monthList,listMonthGroup)'>一月内</a></li>
+						<li><a href="javascript:void(0);" id="yearList"
+							onclick='changeHistoryReport(yearList,listYearGroup)'>今年</a></li>
+						<li><a href="javascript:void(0);" id="allList"
+							onclick='changeHistoryReport(allList,listAllGroup)'>所有</a></li>
+					</ul>
+				</div>
+				<br />
+				<div class="list-group" id="listWeekGroup" style="display: block">
+				</div>
+				<div class="list-group" id="listMonthGroup" style="display: none">
+				</div>
+				<div class="list-group" id="listYearGroup" style="display: none">
+				</div>
+				<div class="list-group" id="listAllGroup" style="display: none">
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<script src="/js/jquery-3.1.1.min.js"></script>
+	<!-- BOOTSTRAP -->
+	<script src="/js/bootstrap.min.js"></script>
+
+	<script type="text/javascript">
+		var reportPartLink = "/test/report/downloadReport?reportfile="
+		$(document).ready(
+				function() {
+					$.post({
+						url : "/test/report/getReportInfo",
+						success : function(data) {
+							console.info(data);
+							console.info(data.current);
+							$("#currentReportDownload").attr("href",
+									reportPartLink + encodeURI(data.current));
+							var weekReport = data.weekly;
+							for (var i = weekReport.length - 1; i >= 0; i--) {
+								var file = weekReport[i];
+								var name = file
+										.slice(file.lastIndexOf("\\") + 1);
+								$("#listWeekGroup").append(
+										'<a href="' + reportPartLink
+												+ encodeURI(file)
+												+ '" class="list-group-item">'
+												+ name + '</a>');
+							}
+							var monthReport = data.monthly;
+							for (var i = monthReport.length - 1; i >= 0; i--) {
+								var file = monthReport[i];
+								var name = file
+										.slice(file.lastIndexOf("\\") + 1);
+								$("#listMonthGroup").append(
+										'<a href="' + reportPartLink
+												+ encodeURI(file)
+												+ '" class="list-group-item">'
+												+ name + '</a>');
+							}
+							var yearReport = data.yearly;
+							for (var i = yearReport.length - 1; i >= 0; i--) {
+								var file = yearReport[i];
+								var name = file
+										.slice(file.lastIndexOf("\\") + 1);
+								$("#listYearGroup").append(
+										'<a href="' + reportPartLink
+												+ encodeURI(file)
+												+ '" class="list-group-item">'
+												+ name + '</a>');
+							}
+							var allReport = data.all;
+							for (var i = allReport.length - 1; i >= 0; i--) {
+								var file = allReport[i];
+								var name = file
+										.slice(file.lastIndexOf("\\") + 1);
+								$("#listAllGroup").append(
+										'<a href="' + reportPartLink
+												+ encodeURI(file)
+												+ '" class="list-group-item">'
+												+ name + '</a>');
+							}
+						}
+					});
+				})
+	</script>
+
+	<script type="text/javascript">
+		$(document)
+				.ready(
+						function() {
+							$.post({
+									url : "/test/report/getCurrentReportDetail",
+									success : function(data) {
+										if (data.result == "OK") {
+											var json = data.reportItem;
+											var len = json.length;
+											if(10 >= len){
+												$("#caesTable").append('<tbody id="reportBody">');
+													for (var i = 0; json.length > i; i++) {
+														if (json[i]['testResult'] == "PASS") {
+															$("#caesTable")
+																	.append(
+																			"<tr><td>"
+																					+ json[i]['moduleName']
+																					+ "</td><td>"
+																					+ json[i]['apiName']
+																					+ "</td><td>"
+																					+ json[i]['caseName']
+																					+ '</td><td style="font-weight:bold ; color:green">'
+																					+ json[i]['testResult']
+																					+ "</td></tr>");
+														} else {
+															$("#caesTable")
+																	.append(
+																			"<tr><td>"
+																					+ json[i]['moduleName']
+																					+ "</td><td>"
+																					+ json[i]['apiName']
+																					+ "</td><td>"
+																					+ json[i]['caseName']
+																					+ '</td><td style="font-weight:bold ; color:red">'
+																					+ json[i]['testResult']
+																					+ "</td></tr>");
+														}
+													}
+													$("#caesTable").append('</tbody>');
+											}else{
+												var pageSize = Math.ceil(len/10);
+												$("#navigation").append('<li class="disabled"><a href="javascript:void(0);" id="pagePrevious" onclick="showPage(0)" aria-label="Previous"><span aria-hidden="true">&laquo;</span></a></li>');
+												for(var x=0; pageSize>x; x++){
+													if(x==0){
+														$("#caesTable").append('<tbody id="reportBody' + (x+1) + '">');
+													}else{
+														$("#caesTable").append('<tbody id="reportBody' + (x+1) + '" style="display:none">');
+													}
+													for(var j=10*x; 10*(x+1)>j; j++){
+														if (json[j]['testResult'] == "PASS") {
+															$("#reportBody" + (x+1))
+																	.append(
+																			"<tr><td>"
+																					+ json[j]['moduleName']
+																					+ "</td><td>"
+																					+ json[j]['apiName']
+																					+ "</td><td>"
+																					+ json[j]['caseName']
+																					+ '</td><td style="font-weight:bold ; color:green">'
+																					+ json[j]['testResult']
+																					+ "</td></tr>");
+														} else {
+															$("#reportBody" + (x+1))
+																	.append(
+																			"<tr><td>"
+																					+ json[j]['moduleName']
+																					+ "</td><td>"
+																					+ json[j]['apiName']
+																					+ "</td><td>"
+																					+ json[j]['caseName']
+																					+ '</td><td style="font-weight:bold ; color:red">'
+																					+ json[j]['testResult']
+																					+ "</td></tr>");
+														}
+														if(j == len-1){
+															break;
+														}
+													}
+													$("#reportBody" + (x+1)).append('</tbody>');
+													if(x==0){
+														$("#navigation").append('<li class="active"><a href="javascript:void(0);" class="page" onclick="showPage(' + (x+1) +')" id="page' + (x+1) +  '">' + (x+1) + '<span class="sr-only">(current)</span></a></li>');
+													}else{
+														if(x>4){
+															$("#navigation").append('<li style="display:none"><a href="javascript:void(0);" class="page" onclick="showPage(' + (x+1) +')" id="page' + (x+1) +  '">' + (x+1) + '</a></li>');
+														}else{
+															$("#navigation").append('<li><a href="javascript:void(0);" class="page" onclick="showPage(' + (x+1) +')" id="page' + (x+1) +  '">' + (x+1) + '</a></li>');
+														}
+													}
+												}
+												$("#caesTable").append('</tbody>');
+												if(5>=pageSize){
+													$("#navigation").append('<li class="disabled"><a href="javascript:void(0);" id="pageNext" onclick="showPage(1000)" aria-label="Next"> <span aria-hidden="true">&raquo;</span></a></li>');
+												}else{
+													$("#navigation").append('<li><a href="javascript:void(0);" id="pageNext" onclick="showPage(1000)" aria-label="Next"> <span aria-hidden="true">&raquo;</span></a></li>');
+												}
+												$("#navpanel").append('<span style="position:absolute; margin-left:15px; margin-top:29px">共' + pageSize + '页</span>');
+											}
+										}
+									}
+								});
+						});
+	</script>
+
+	<script type="text/javascript">
+		
+		function toggleFun(ele){
+			var spanId = ele.id;
+			var flag = $("#" + spanId +"Div").css("display");
+			if (flag == "none") {
+				$("#" + spanId +"Div").css("display", "block");
+				$("#" + spanId +"A").text("收起");
+				$("#" + spanId +"Img").attr("src", "/images/collapse.png")
+			} else {
+				$("#" + spanId +"Div").css("display", "none");
+				$("#" + spanId +"A").text("详情");
+				$("#" + spanId +"Img").attr("src", "/images/expand.png")
+			}
+		}
+
+		function changeHistoryReport(link, group) {
+			var linkId = link.id;
+			var groupId = group.id;
+			var text = $("#" + linkId).text();
+			$("#dropdownHistoryReport").html(
+					text + '  <span class="caret"></span>');
+			$(".list-group").css("display", "none");
+			$("#" + groupId).css("display", "block");
+		}
+		
+		function showPage(index){
+			var pageElements = $("a.page");
+			var reportElements = $("tbody");
+			var pageSize = pageElements.length;
+			var reportSize = reportElements.length;
+			if(index == 0){
+				var prePage = $("#pagePrevious").parent();
+				var clsname = prePage.attr("class");
+				if(clsname == "disabled"){
+					return;
+				}else{
+					//获取当前高亮分页标签
+					var activePage = $("ul#navigation li.active");
+					var activeIndex = parseInt(activePage.children("a").text());
+					activePage.removeAttr("class");
+					//高亮下一个分页标签
+					$("#page" + (activeIndex-1)).parent().attr("class","active");
+					//所有报告页面先设置为不显示，再设置显示显示高亮分页标签对应的报告页面
+					for(var i=0; reportSize>i; i++){
+						$("#reportBody" + (i+1)).css("display","none");
+					}
+					$("#reportBody" + (activeIndex-1)).removeAttr("style");
+					var first = 0;
+					//找出当前显示的第一个分页标签，并记下序号
+					for(var i=0; pageSize>i; i++){
+						var li = $("#page" + (i+1)).parent();
+						var stylename = li.attr("style");
+						if(stylename == undefined){
+							first = i+1;
+							break;
+						}
+					}
+					//往前移动一个标签页（设置显示前一个标签页，设置隐藏当前标签最以后一个标签）
+					$("#page" + (first-1)).parent().removeAttr("style");
+					$("#page" + (first+4)).parent().css("display","none");
+					$("#pageNext").parent().removeAttr("class");
+					//如果前移到全部标签分页的第一个，则设置previous按钮为disabled类
+					if(first == 2){
+						$("#pagePrevious").parent().attr("class","disabled");
+					}
+				}
+			}else if(index == 1000){
+				var prePage = $("#pageNext").parent();
+				var clsname = prePage.attr("class");
+				if(clsname == "disabled"){
+					return;
+				}else{
+					var activePage = $("ul#navigation li.active");
+					var activeIndex = parseInt(activePage.children("a").text());
+					activePage.removeAttr("class");
+					//高亮下一个分页标签
+					$("#page" + (activeIndex+1)).parent().attr("class","active");
+					//显示高亮报告页面
+					for(var i=0; reportSize>i; i++){
+						$("#reportBody" + (i+1)).css("display","none");
+					}
+					$("#reportBody" + (activeIndex+1)).removeAttr("style");
+					var first = 0;
+					for(var i=0; pageSize>i; i++){
+						var li = $("#page" + (i+1)).parent();
+						var stylename = li.attr("style");
+						if(stylename == undefined){
+							first = i+1;
+							break;
+						}
+					}
+					$("#page" + (first)).parent().css("display","none");
+					$("#page" + (first+5)).parent().removeAttr("style");
+					$("#pagePrevious").parent().removeAttr("class");
+					//如果后移到全部标签分页的第后一个，则设置Next按钮为disabled类
+					if(first+5>=pageSize){
+						$("#pageNext").parent().attr("class","disabled");
+					}
+				}
+			}else{
+				for(var i=0; reportElements.length>i; i++){
+					$("#reportBody" + (i+1)).css("display","none");
+				}
+				$("#reportBody" + index).removeAttr("style");
+				
+				var activePage = $("ul#navigation li.active");
+				activePage.removeAttr("class");
+				var curPage = $("#page" + index).parent();
+				curPage.attr("class","active");
+			}
+		}
+	</script>
+</body>
+
+</html>

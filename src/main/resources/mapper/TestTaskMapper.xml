@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+    PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.yt.qa.dao.TestTaskMapper">
+	<resultMap type="com.yt.qa.core.TestCaseTask" id="testCaseMapper">
+        <id property="id" column="id" javaType="Long" />
+        <result property="userName" column="userName" javaType="string"/>
+        <result property="excelFile" column="excelFile" javaType="string"/>
+        <result property="sheetName" column="sheetName" javaType="string"/>
+        <result property="caseName" column="caseName" javaType="string"/>
+        <result property="method" column="method" javaType="string"/>
+        <result property="path" column="path" javaType="string"/>
+        <result property="port" column="port" javaType="string"/>
+        <result property="inputNum" column="inputNum" javaType="int"/>
+        <result property="expectResult" column="expectResult" javaType="string"/>
+        <result property="testResult" column="testResult" javaType="string"/>
+        <result property="Response" column="Response" javaType="string"/>
+        <result property="deleted" column="deleted" javaType="int"/>
+        <result property="create_time" column="create_time" javaType="date"/>
+     </resultMap>
+
+	<insert id="insertTestTaskLog" parameterType="com.yt.qa.core.TestCaseTask">
+	    Insert into test_task_log(userName, excelFile, sheetName, caseName, method, path,
+	    port, inputNum,expectResult,testResult,Response,create_time) value(#{userName}, #{excelFile},#{sheetName},#{caseName},
+	    #{method},#{path},#{port},#{inputNum}, #{expectResult},#{testResult},#{Response},now());
+	</insert>
+	
+	<select id="countTestedTask" resultType="java.lang.Integer">
+	    SELECT COUNT(1) AS num FROM test_task_log WHERE deleted = 0
+	    <if test="userName != null">
+	       AND userName = '${userName}';
+	    </if>
+	</select>
+	
+	<update id="updateTestTaskByUserName">
+	    UPDATE test_task_log SET deleted = 1 WHERE deleted = 0
+	    <if test="userName != null">
+	       AND userName = '${userName}';
+	    </if>
+	</update>
+</mapper>

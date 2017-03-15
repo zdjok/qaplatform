@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+<meta charset="utf-8" />
+<title>芸泰接口测试平台</title>
+<meta name="viewport"
+	content="width=device-width, initial-scale=1.0, maximum-scale=1, user-scalable=no" />
+<link rel="stylesheet" type="text/css" href="/css/qa.css" />
+<link rel="stylesheet" type="text/css" href="/css/bootstrap.min.css" />
+<link rel="stylesheet" type="text/css" href="/css/fileinput.min.css" />
+<link rel="stylesheet" type="text/css" href="/css/toastr.min.css" />
+</head>
+
+<body class="bodybg">
+	<nav class="navbar navbar-default">
+		<div class="container-fluid">
+			<!-- Brand and toggle get grouped for better mobile display -->
+			<div class="navbar-header">
+				<button type="button" class="navbar-toggle collapsed"
+					data-toggle="collapse" data-target="#bs-example-navbar-collapse-1"
+					aria-expanded="false">
+					<span class="sr-only">Toggle navigation</span> <span
+						class="icon-bar"></span> <span class="icon-bar"></span> <span
+						class="icon-bar"></span>
+				</button>
+				<a class="navbar-left" href="#"> <img alt="logo"
+					src="/images/logo.png" />
+				</a>
+			</div>
+
+			<!-- Collect the nav links, forms, and other content for toggling -->
+			<div class="collapse navbar-collapse"
+				id="bs-example-navbar-collapse-1">
+				<ul class="nav navbar-nav navbar-right">
+					<li class="dropdown"><a href="#" class="dropdown-toggle"
+						data-toggle="dropdown" role="button" aria-haspopup="true"
+						aria-expanded="false"><span th:text="${username}"></span> <span
+							class="caret"></span></a>
+						<ul class="dropdown-menu">
+							<li><a href="#">个人中心</a></li>
+							<li role="separator" class="divider"></li>
+							<li><a href="/doLoginOut">注销</a></li>
+						</ul></li>
+				</ul>
+			</div>
+			<!-- /.navbar-collapse -->
+		</div>
+		<!-- /.container-fluid -->
+	</nav>
+
+	<div class="container">
+		<div class="page-header">
+			<h2 id="containerHead">开始测试：</h2>
+		</div>
+
+		<div class="panel panel-default">
+			<!-- Default panel contents -->
+			<div class="panel-heading" id="panelHead">测试进度：</div>
+			<div class="panel-body" id="progressDiv">
+				<h5>测试进度：</h5>
+				<div class="progress">
+					<div class="progress-bar" role="progressbar" id="progressbar"
+						aria-valuenow="2" aria-valuemin="0" aria-valuemax="100"
+						style="width: 0%;">0%</div>
+				</div>
+			</div>
+		</div>
+		<button class="btn btn-danger btn-block" style="display: block"
+			type="button" id="btnStart">点我开始测试</button>
+		<span th:text="${total}" style="display:none" id="totalcase"></span>
+		<div>
+			<img alt="loading-report" src="/images/loading-big.gif"
+				id="reportImg" style="display: none" /> <a
+				href="/test/testreport/reportview" id="reportDiv"
+				style="display: none">查看测试报告</a>
+		</div>
+	</div>
+
+	<script src="/js/jquery-3.1.1.min.js"></script>
+	<!-- BOOTSTRAP -->
+	<script src="/js/bootstrap.min.js"></script>
+	<script src="/js/toastr.min.js"></script>
+	<script type="text/javascript">
+		toastr.options = {
+			positionClass : 'toast-top-center',
+			showDuration : '3000'
+		};
+	</script>
+	<script type="text/javascript">
+/* 		var reportFileName; */
+		var totalTask = $("#totalcase").text();
+		var sh;
+/* 		$(document).ready(function() {
+			$.get({
+				url : "/test/getTotalTaskSize",
+				success : function(data) {
+					if (data.result == 'OK') {
+						totalTask = data.size;
+					}
+				}
+			});
+		}); */
+
+		function getTaskSizeHasRunned() {
+			$.get({
+				url : "/test/getTaskSizeHasRunned",
+				success : function(data) {
+					//1. 获取元素
+					//2. 设置属性progress
+					var width = Math.ceil($("#progressbar").width()/100);
+					var doneProcess = (data.size / totalTask) * 100;
+					var nowwidth = Math.ceil(width + doneProcess);
+					if (data.size == totalTask) {
+						$("#progressbar").width(100 + "%");
+						$("#progressbar").text(100 + "%")
+						clearInterval(sh);
+						$("#reportImg").css("display", "block");
+						toastr.success("测试完成！ 正在生成测试报告，请稍后!");
+						//暂停5秒再显示查看测试报告链接，stupid idea！！！
+						var t=setTimeout('$("#reportImg").css("display", "none");$("#reportDiv").css("display", "block");',5000)
+/*  						$("#reportImg").css("display", "none");
+						$("#reportDiv").css("display", "block");  */
+					} else {
+						$("#progressbar").width(nowwidth + "%");
+						$("#progressbar").text(nowwidth + "%")
+					}
+				}
+			})
+		}
+
+		$("#btnStart").click(function() {
+			$("#btnStart").css("display", "none");
+			$.post({
+				url : "/test/startInterfaceTest",
+				success : function(data) {
+					if (data.result == "OK") {
+						//显示查看测试报告连接
+/* 						reportFileName = data.reportFileName; */
+/*  						$("#reportImg").css("display", "none");
+						$("#reportDiv").css("display", "block"); */
+					}
+				}
+			})
+			sh = setInterval(function() {
+				getTaskSizeHasRunned();
+			}, 500)
+		})
+
+		function loginout() {
+			$.post("/doLoginOut", function() {
+				window.location.href = "/login"
+			});
+		}
+	</script>
+</body>
+
+</html>

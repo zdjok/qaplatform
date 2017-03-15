@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+<meta charset="utf-8" />
+<title>芸泰接口测试平台</title>
+<meta name="viewport"
+	content="width=device-width, initial-scale=1.0, maximum-scale=1, user-scalable=no" />
+<link rel="stylesheet" type="text/css" href="/css/qa.css" />
+<link rel="stylesheet" type="text/css" href="/css/bootstrap.min.css" />
+<script src="/js/jquery-3.1.1.min.js"></script>
+<!-- BOOTSTRAP -->
+<script src="/js/bootstrap.min.js"></script>
+<script type="text/javascript">
+	$(document).ready(function() {
+		$("#interfaceTest").mouseenter(function() {
+			$("#interfaceTest").css("border", "1px solid blue");
+		});
+		$("#interfaceTest").mouseleave(function() {
+			$("#interfaceTest").css("border", "1px solid gray");
+		});
+	});
+</script>
+</head>
+<body class="bodybg">
+
+	<nav class="navbar navbar-default">
+		<div class="container-fluid">
+			<!-- Brand and toggle get grouped for better mobile display -->
+			<div class="navbar-header">
+				<button type="button" class="navbar-toggle collapsed"
+					data-toggle="collapse" data-target="#bs-example-navbar-collapse-1"
+					aria-expanded="false">
+					<span class="sr-only">Toggle navigation</span> <span
+						class="icon-bar"></span> <span class="icon-bar"></span> <span
+						class="icon-bar"></span>
+				</button>
+				<a class="navbar-left" href="#"> <img alt="logo"
+					src="/images/logo.png" />
+				</a>
+			</div>
+
+			<!-- Collect the nav links, forms, and other content for toggling -->
+			<div class="collapse navbar-collapse"
+				id="bs-example-navbar-collapse-1">
+				<ul class="nav navbar-nav navbar-right">
+					<li class="dropdown"><a href="#" class="dropdown-toggle"
+						data-toggle="dropdown" role="button" aria-haspopup="true"
+						aria-expanded="false"><span th:text="${username}"></span> <span
+							class="caret"></span></a>
+						<ul class="dropdown-menu">
+							<li><a href="#">个人中心</a></li>
+							<li role="separator" class="divider"></li>
+							<li><a href="/doLoginOut">注销</a></li>
+						</ul></li>
+				</ul>
+			</div>
+			<!-- /.navbar-collapse -->
+		</div>
+		<!-- /.container-fluid -->
+	</nav>
+	<div class="container">
+		<div class="page-header">
+			<h2>请选择测试类型：</h2>
+		</div>
+		<div class="row">
+			<div class="col-sm-6 col-md-4">
+				<div class="thumbnail" id="interfaceTest"
+					style="height: 180px; width: 100%; display: block; border: 1px solid gray;">
+					<div class="caption">
+						<h3>接口测试</h3>
+						<p>云医院/单院接口自动化测试，支持http、https协议。</p>
+						<p style="color:blue">目前只支持单院接口</p>
+					</div>
+				</div>
+			</div>
+
+			<div class="col-sm-6 col-md-4">
+				<div class="thumbnail" id="functionTest"
+					style="height: 180px; width: 100%; display: block; border: 1px solid gray;">
+					<div class="caption">
+						<h3>功能测试</h3>
+						<p>Coming Soon...</p>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<script type="text/javascript">
+		function loginout() {
+			$.post("/doLoginOut", function() {
+				window.location.href = "/login"
+			});
+		}
+
+		$("#interfaceTest").click(function() {
+			$.ajax({
+				url : "/test/selectInterfaceTest",
+				type : "post",
+				success : function(data) {
+					if (data.result == 'OK') {
+						window.location.href = "/test/interface-test-prepare";
+					}
+				}
+			});
+		});
+	</script>
+</body>
+</html>

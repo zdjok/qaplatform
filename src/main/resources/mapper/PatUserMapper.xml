@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+    PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.yt.qa.dao.PatUserMapper">
+    <resultMap type="com.yt.qa.entity.PatUserDO" id="patUserMapper">
+        <id property="patId" column="pat_id" javaType="int"/>
+        <result property="usId" column="us_id" javaType="int"/>
+        <result property="patName" column="pat_name" javaType="string"/>
+        <result property="idCardNo" column="id_card_no" javaType="string"/>
+        <result property="phoneNo" column="phone_no" javaType="string"/>
+        <result property="createTime" column="create_time" javaType="date"/>
+    </resultMap>
+    
+    <select id="selectPatUserById" parameterType="int" resultMap="patUserMapper">
+        select pat_id, us_id, pat_name, id_card_no, phone_no, create_time from pat_user where pat_id = #{id}
+    </select>
+    
+    <select id="getAllPatUser" resultMap="patUserMapper">
+        select pat_id, us_id, pat_name, id_card_no, phone_no, create_time from pat_user
+    </select>
+</mapper>
